@@ -8,6 +8,6 @@ public class Reserva
     public required string Estado { get; set; }
     public string? IdEventoGoogle { get; set; }
     public int Monto { get; set; }
-    public int Huespedid { get; set; }
+    public int HuespedId { get; set; }
     public required Huesped Huesped { get; set; }
 }
