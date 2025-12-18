@@ -5,9 +5,9 @@ public class Reserva
     public DateTime FechaInicio { get; set; }
     public DateTime FechaFin { get; set; }
     public int CantidadPersonas { get; set; }
-    public required string Estado { get; set; }
+    public  string Estado { get; set; } = string.Empty;
     public string? IdEventoGoogle { get; set; }
     public int Monto { get; set; }
     public int HuespedId { get; set; }
-    public required Huesped Huesped { get; set; }
+    public  Huesped Huesped { get; set; } = null!;
 }
