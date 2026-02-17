@@ -4,6 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddScoped<HuespedService>();
+builder.Services.AddScoped<ReservaService>();
+
 
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(

@@ -12,11 +12,4 @@ using Microsoft.EntityFrameworkCore;
         public DbSet<Huesped> huespedes { get; set; }
         public DbSet<Reserva> reservas { get; set; }
 
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.UseSnakeCaseNamingConvention();
-
-            base.OnModelCreating(modelBuilder);
-
-        }*/
     }
