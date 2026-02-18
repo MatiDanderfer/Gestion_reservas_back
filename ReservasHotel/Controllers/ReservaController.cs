@@ -9,7 +9,7 @@ public class ReservaController : ControllerBase
     {
         _reservaService = reservaService;
     }
-    /*
+    
     [HttpGet("buscar")]
     public IActionResult Buscar(string nombreHuesped)
     {
@@ -18,9 +18,9 @@ public class ReservaController : ControllerBase
     }
 
     [HttpPost("crear")]
-    public IActionResult Crear(Reserva reserva)
+    public IActionResult Crear(ReservaCreateDTO dto)
     {
-        var nuevaReserva = _reservaService.Crear(reserva);
+        var nuevaReserva = _reservaService.Crear(dto);
         return Ok(nuevaReserva);
     }
 
@@ -29,5 +29,5 @@ public class ReservaController : ControllerBase
     {
         _reservaService.Eliminar(id);
         return NoContent();
-    }*/
+    }
 }

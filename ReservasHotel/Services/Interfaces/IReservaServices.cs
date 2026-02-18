@@ -1,6 +1,6 @@
 public interface IReservaService
 {
-    List<Reserva> Buscar(string nombreHuesped);
-    Reserva Crear(Reserva reserva);
-    void Eliminar(int id);
+    //List<Reserva> Buscar(string nombreHuesped);
+    //Reserva Crear(Reserva reserva);
+    // Eliminar(int id);
 }

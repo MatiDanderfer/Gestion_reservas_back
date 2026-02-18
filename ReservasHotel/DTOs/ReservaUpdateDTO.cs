@@ -5,5 +5,6 @@ public class ReservaUpdateDTO
     public DateTime FechaSalida { get; set; }
     public int CantidadPersonas { get; set; }
     public string Comentarios { get; set; }
+    public int Monto { get; set; }
 
 }

@@ -19,9 +19,9 @@ public class HuespedController : ControllerBase
     }
 
     [HttpPost("crear")]
-    public IActionResult Crear(Huesped huesped)
+    public IActionResult Crear(HuespedCreateDTO dto)
     {
-        var nuevoHuesped = _huespedService.Crear(huesped);
+        var nuevoHuesped = _huespedService.Crear(dto);
         return Ok(nuevoHuesped);
     }
 
