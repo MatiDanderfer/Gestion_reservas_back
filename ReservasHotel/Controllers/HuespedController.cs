@@ -31,4 +31,11 @@ public class HuespedController : ControllerBase
         _huespedService.Eliminar(id);
         return NoContent();
     }
+    
+    [HttpPut("actualizar/{id}")]
+    public IActionResult Actualizar(int id, HuespedUpdateDTO dto)
+    {
+        var huespedActualizado = _huespedService.Actualizar(id, dto);
+        return Ok(huespedActualizado);
+    }
 }

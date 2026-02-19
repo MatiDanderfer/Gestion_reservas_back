@@ -30,4 +30,11 @@ public class ReservaController : ControllerBase
         _reservaService.Eliminar(id);
         return NoContent();
     }
+    
+    [HttpPut("actualizar/{id}")]
+    public IActionResult Actualizar(int id, ReservaUpdateDTO dto)
+    {
+        var reservaActualizada = _reservaService.Actualizar(id, dto);
+        return Ok(reservaActualizada);
+    }
 }
