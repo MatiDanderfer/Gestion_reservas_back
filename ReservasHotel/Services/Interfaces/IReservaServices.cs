@@ -4,4 +4,5 @@ public interface IReservaService
     Reserva Crear(ReservaCreateDTO reserva);
     void Eliminar(int id);
     Reserva Actualizar(int id, ReservaUpdateDTO dto);
+    Reserva BuscarPorId(int id);
 }

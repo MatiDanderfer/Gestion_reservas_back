@@ -54,6 +54,19 @@ public class ReservaService : IReservaService
             reserva.Comentarios = dto.Comentarios;
             reserva.Monto = dto.Monto;
             _context.SaveChanges();
+        }else
+        {
+            return null;
+        }
+        return reserva;
+    }
+    // Buscar una reserva por ID
+    public Reserva BuscarPorId(int id)
+    {
+        var reserva = _context.reservas.Find(id);
+        if (reserva == null)
+        {
+            return null;
         }
         return reserva;
     }

@@ -13,7 +13,7 @@ public class TestDbControllers : ControllerBase
         _context = context;
     }
 
-    /*[HttpGet("huespedes")]
+    [HttpGet("huespedes")]
     public async Task<IActionResult> GetHuespedes()
     {
         var huespedes = await _context.huespedes.ToListAsync();
@@ -25,7 +25,7 @@ public class TestDbControllers : ControllerBase
     {
         var reservas = await _context.reservas.ToListAsync();
         return Ok(reservas);
-    }*/
+    }
 
     [HttpGet("ping")]
     public IActionResult Ping()

@@ -36,6 +36,10 @@ public class HuespedController : ControllerBase
     public IActionResult Actualizar(int id, HuespedUpdateDTO dto)
     {
         var huespedActualizado = _huespedService.Actualizar(id, dto);
+        if (huespedActualizado == null)
+        {
+            return NotFound($"Huésped no encontrado con id: {id}.");
+        }
         return Ok(huespedActualizado);
     }
 }
