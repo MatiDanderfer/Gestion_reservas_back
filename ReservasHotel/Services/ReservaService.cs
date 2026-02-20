@@ -10,15 +10,21 @@ public class ReservaService : IReservaService
     }
     // Implementación de métodos CRUD para Reserva
     // Buscar por nombre del huésped
-    public List<Reserva> Buscar(string nombreHuesped)
+    public async Task<List<Reserva>> Buscar(string nombreHuesped)
     {
-        return _context.reservas.Include(r => r.Huesped)
+        return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.Huesped.Nombre.Contains(nombreHuesped))
-            .ToList();
+            .ToListAsync();
     }
     // Crear una nueva reserva
-    public Reserva Crear(ReservaCreateDTO dto)
+    public async Task<Reserva> Crear(ReservaCreateDTO dto)
     {
+        var solapamiento = await _context.reservas.AnyAsync(
+            r => r.FechaInicio <= dto.FechaSalida && r.FechaFin >= dto.FechaEntrada);
+        if (solapamiento)
+        {
+            throw new InvalidOperationException("Las fechas de la reserva se solapan con otra reserva existente.");
+        }
         var reserva = new Reserva
         {
             HuespedId = dto.HuespedId,
@@ -29,45 +35,68 @@ public class ReservaService : IReservaService
             Monto = dto.Monto
         };
         _context.reservas.Add(reserva);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return reserva;
     }
     // Eliminar una reserva por ID
-    public void Eliminar(int id)
+    public async Task<bool> Eliminar(int id)
     {
-        var reserva = _context.reservas.Find(id);
+        var reserva = await _context.reservas.FindAsync(id);
         if (reserva != null)
         {
             _context.reservas.Remove(reserva);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return true;
         }
+        return false;
     }
     // Actualizar una reserva existente
-    public Reserva Actualizar(int id, ReservaUpdateDTO dto)
+    public async Task<Reserva?> Actualizar(int id, ReservaUpdateDTO dto)
     {
-        var reserva = _context.reservas.Find(id);
-        if (reserva != null)
-        {
-            reserva.FechaInicio = dto.FechaEntrada;
-            reserva.FechaFin = dto.FechaSalida;
-            reserva.CantidadPersonas = dto.CantidadPersonas;
-            reserva.Comentarios = dto.Comentarios;
-            reserva.Monto = dto.Monto;
-            _context.SaveChanges();
-        }else
-        {
-            return null;
-        }
-        return reserva;
-    }
-    // Buscar una reserva por ID
-    public Reserva BuscarPorId(int id)
-    {
-        var reserva = _context.reservas.Find(id);
+        var reserva = await _context.reservas.FindAsync(id);
         if (reserva == null)
         {
             return null;
         }
+        var solapamiento = await _context.reservas.AnyAsync(
+            r => r.IdReserva != id && r.FechaInicio <= dto.FechaSalida && r.FechaFin >= dto.FechaEntrada);
+        if (solapamiento){
+            throw new InvalidOperationException("Las fechas de la reserva se solapan con otra reserva existente.");
+        }
+        reserva.FechaInicio = dto.FechaEntrada;
+        reserva.FechaFin = dto.FechaSalida;
+         reserva.CantidadPersonas = dto.CantidadPersonas;
+        reserva.Comentarios = dto.Comentarios;
+        reserva.Monto = dto.Monto;
+        await _context.SaveChangesAsync();
         return reserva;
+    }
+    // Buscar una reserva por ID
+    public async Task<Reserva?> BuscarPorId(int id)
+    {
+        return await _context.reservas.FindAsync(id);
+    }
+
+    //Listar todas las reservas
+    public async Task<List<Reserva>> ListarTodas()
+    {
+        return await _context.reservas.Include(r => r.Huesped).ToListAsync();
+        
+    }
+
+    //Buscar reservas por fecha
+    public async Task<List<Reserva>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida)
+    {
+        return await _context.reservas.Include(r => r.Huesped)
+            .Where(r => r.FechaInicio >= fechaEntrada && r.FechaFin <= fechaSalida)
+            .ToListAsync();
+    }
+
+    //Buscar reservas desde una fecha de inicio
+    public async Task<List<Reserva>> BuscarDesdeInicio(DateTime fechaInicio)
+    {
+        return await _context.reservas.Include(r => r.Huesped)
+            .Where(r => r.FechaInicio >= fechaInicio)
+            .ToListAsync();
     }
 }

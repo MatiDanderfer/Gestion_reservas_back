@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 public class HuespedService : IHuespedService
 {
     private readonly AppDbContext _context;
@@ -9,14 +11,14 @@ public class HuespedService : IHuespedService
 
     // Implementación de métodos CRUD para Huesped
     // Buscar por nombre y apellido
-    public List<Huesped> Buscar(string nombre, string apellido)
+    public async Task<List<Huesped>> Buscar(string nombre, string apellido)
     {
-        return _context.huespedes
+        return await _context.huespedes
             .Where(h => h.Nombre.Contains(nombre) && h.Apellido.Contains(apellido))
-            .ToList();
+            .ToListAsync();
     }
     // Crear un nuevo huésped
-    public Huesped Crear(HuespedCreateDTO dto)
+    public async Task<Huesped> Crear(HuespedCreateDTO dto)
     {
         var huesped = new Huesped
         {
@@ -25,30 +27,58 @@ public class HuespedService : IHuespedService
             Telefono = dto.Telefono
         };
         _context.huespedes.Add(huesped);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
         return huesped;
     }
     // Eliminar un huésped por ID
-    public void Eliminar(int id)
+    public async Task<bool> Eliminar(int id)
     {
-        var huesped = _context.huespedes.Find(id);
+        var huesped = await _context.huespedes.FindAsync(id);
         if (huesped != null)
         {
             _context.huespedes.Remove(huesped);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return true;
         }
+        return false;
     }
     // Actualizar un huésped existente
-    public Huesped Actualizar(int id, HuespedUpdateDTO dto)
+    public async Task<Huesped?> Actualizar(int id, HuespedUpdateDTO dto)
     {
-        var huesped = _context.huespedes.Find(id);
+        var huesped = await _context.huespedes.FindAsync(id);
         if (huesped != null)
         {
             huesped.Nombre = dto.Nombre;
             huesped.Apellido = dto.Apellido;
             huesped.Telefono = dto.Telefono;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         return huesped;
+    }
+
+    // Buscar un huésped por ID
+    public async Task<Huesped?> BuscarPorId(int id)
+    {
+        return await _context.huespedes.FindAsync(id);
+    }
+
+    // Listar todos los huéspedes
+    public async Task<List<Huesped>> ListarTodos()
+    {
+        return await _context.huespedes.ToListAsync();
+    }
+    // Buscar huéspedes por nombre
+    public async Task<List<Huesped>> BuscarPorNombre(string nombre)
+    {
+        return await _context.huespedes
+            .Where(h => h.Nombre.Contains(nombre))
+            .ToListAsync();
+    }
+    // Buscar huéspedes por apellido
+    public async Task<List<Huesped>> BuscarPorApellido(string apellido)
+    {
+        return await _context.huespedes
+            .Where(h => h.Apellido.Contains(apellido))
+            .ToListAsync();
     }
 }

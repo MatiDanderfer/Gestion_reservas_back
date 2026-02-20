@@ -11,9 +11,9 @@ public class ReservaController : ControllerBase
     }
     
     [HttpGet("buscar")]
-    public IActionResult Buscar(string nombreHuesped)
+    public async Task<IActionResult> Buscar(string nombreHuesped)
     {
-        var reservas = _reservaService.Buscar(nombreHuesped);
+        var reservas = await _reservaService.Buscar(nombreHuesped);
         if (reservas == null || reservas.Count == 0)
         {
             return NotFound("No se encontraron reservas para el huésped especificado.");
@@ -22,32 +22,82 @@ public class ReservaController : ControllerBase
     }
 
     [HttpPost("crear")]
-    public IActionResult Crear(ReservaCreateDTO dto)
+    public async Task<IActionResult> Crear(ReservaCreateDTO dto)
     {
         if (dto == null)
         {
             return BadRequest("Datos de reserva no proporcionados.");
         }
-        var nuevaReserva = _reservaService.Crear(dto);
-        return Ok(nuevaReserva);
-    }
-
-    [HttpDelete("eliminar/{id}")]
-    public IActionResult Eliminar(int id)
-    {
-        var reserva = _reservaService.BuscarPorId(id);
-        if (reserva == null)
+        try
         {
-            return BadRequest("Reserva no encontrada.");
+            var nuevaReserva = await _reservaService.Crear(dto);
+            return Ok(nuevaReserva);
         }
-        _reservaService.Eliminar(id);
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+    [HttpDelete("eliminar/{id}")]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        var existe = await _reservaService.Eliminar(id);
+        if (!existe)
+        {
+            return NotFound($"Reserva no encontrada con id: {id}.");
+        }
         return NoContent();
     }
     
     [HttpPut("actualizar/{id}")]
-    public IActionResult Actualizar(int id, ReservaUpdateDTO dto)
+    public async Task<IActionResult> Actualizar(int id, ReservaUpdateDTO dto)
     {
-        var reservaActualizada = _reservaService.Actualizar(id, dto);
+        try
+        {
+        var reservaActualizada = await _reservaService.Actualizar(id, dto);
+        if (reservaActualizada == null)
+        {
+            return NotFound($"Reserva no encontrada con id: {id}.");
+        }
         return Ok(reservaActualizada);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(ex.Message);
+        }
+    }
+
+    [HttpGet("listar")]
+    public async Task<IActionResult> ListarTodas()
+    {
+        var reservas = await _reservaService.ListarTodas();
+        if (reservas == null || reservas.Count == 0)
+        {
+            return NotFound("No se encontraron reservas.");
+        }
+        return Ok(reservas);
+    }
+
+    [HttpGet("buscarPorFecha")]
+    public async Task<IActionResult> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida)
+   {
+        if (fechaEntrada > fechaSalida)
+            return BadRequest("La fecha de entrada no puede ser posterior a la fecha de salida.");
+    
+        var reservas = await _reservaService.BuscarPorFecha(fechaEntrada, fechaSalida);
+        if (reservas == null || reservas.Count == 0)
+                return NotFound("No se encontraron reservas para las fechas especificadas.");
+        return Ok(reservas);
+    }
+
+    [HttpGet("buscarDesdeInicio")]
+    public async Task<IActionResult> BuscarDesdeInicio(DateTime fechaInicio)
+    {
+        var reservas = await _reservaService.BuscarDesdeInicio(fechaInicio);
+        if (reservas == null || reservas.Count == 0)
+        {
+            return NotFound("No se encontraron reservas desde la fecha especificada.");
+        }
+        return Ok(reservas);
     }
 }
