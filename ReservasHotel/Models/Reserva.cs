@@ -24,4 +24,6 @@ public class Reserva
     [Column("huesped_idhuesped")]
     public int HuespedId { get; set; }
     public  Huesped Huesped { get; set; } = null!;
+    [Column("seña")]
+    public int Seña { get; set; } = 0;
 }

@@ -1,13 +1,14 @@
 public interface IReservaService
 {
-    Task<List<Reserva>> Buscar(string nombreHuesped);
-    Task<Reserva> Crear(ReservaCreateDTO reserva);
+    Task<List<ReservaRespuestaDTO>> Buscar(string nombreHuesped);
+    Task<ReservaRespuestaDTO> Crear(ReservaCreateDTO reserva);
     Task<bool> Eliminar(int id);
-    Task<Reserva?> Actualizar(int id, ReservaUpdateDTO dto);
-    Task<Reserva?> BuscarPorId(int id);
-    Task<List<Reserva>> ListarTodas();
+    Task<ReservaRespuestaDTO?> Actualizar(int id, ReservaUpdateDTO dto);
+    Task<ReservaRespuestaDTO?> BuscarPorId(int id);
+    Task<List<ReservaRespuestaDTO>> ListarTodas();
 
-    Task<List<Reserva>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida);
-    Task<List<Reserva>> BuscarDesdeInicio(DateTime fechaInicio);
-    Task<Reserva?> CambiarEstado(int id, string nuevoEstado);
+    Task<List<ReservaRespuestaDTO>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida);
+    Task<List<ReservaRespuestaDTO>> BuscarDesdeInicio(DateTime fechaInicio);
+    Task<ReservaRespuestaDTO?> CambiarEstado(int id, string nuevoEstado);
+    
 }

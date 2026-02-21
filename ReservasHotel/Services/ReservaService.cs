@@ -10,14 +10,15 @@ public class ReservaService : IReservaService
     }
     // Implementación de métodos CRUD para Reserva
     // Buscar por nombre del huésped
-    public async Task<List<Reserva>> Buscar(string nombreHuesped)
+    public async Task<List<ReservaRespuestaDTO>> Buscar(string nombreHuesped)
     {
         return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.Huesped.Nombre.Contains(nombreHuesped))
+            .Select(r => MapearRespuesta(r))
             .ToListAsync();
     }
     // Crear una nueva reserva
-    public async Task<Reserva> Crear(ReservaCreateDTO dto)
+    public async Task<ReservaRespuestaDTO> Crear(ReservaCreateDTO dto)
     {
         var solapamiento = await _context.reservas.AnyAsync(
             r => r.FechaInicio <= dto.FechaSalida && r.FechaFin >= dto.FechaEntrada);
@@ -33,11 +34,13 @@ public class ReservaService : IReservaService
             CantidadPersonas = dto.CantidadPersonas,
             Comentarios = dto.Comentarios,
             Monto = dto.Monto,
-            Estado = dto.Estado
+            Estado = dto.Estado,
+            Seña = dto.Seña
         };
         _context.reservas.Add(reserva);
         await _context.SaveChangesAsync();
-        return reserva;
+        await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
+        return MapearRespuesta(reserva);
     }
     // Eliminar una reserva por ID
     public async Task<bool> Eliminar(int id)
@@ -52,7 +55,7 @@ public class ReservaService : IReservaService
         return false;
     }
     // Actualizar una reserva existente
-    public async Task<Reserva?> Actualizar(int id, ReservaUpdateDTO dto)
+    public async Task<ReservaRespuestaDTO?> Actualizar(int id, ReservaUpdateDTO dto)
     {
         var reserva = await _context.reservas.FindAsync(id);
         if (reserva == null)
@@ -70,38 +73,48 @@ public class ReservaService : IReservaService
         reserva.Comentarios = dto.Comentarios;
         reserva.Monto = dto.Monto;
         reserva.Estado = dto.Estado;
+        reserva.Seña = dto.Seña;
         await _context.SaveChangesAsync();
-        return reserva;
+        await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
+        return MapearRespuesta(reserva);
     }
     // Buscar una reserva por ID
-    public async Task<Reserva?> BuscarPorId(int id)
+    public async Task<ReservaRespuestaDTO?> BuscarPorId(int id)
     {
-        return await _context.reservas.FindAsync(id);
+        var reserva = await _context.reservas.FindAsync(id);
+        if (reserva == null)
+        {
+            return null;
+        }
+        await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
+        return MapearRespuesta(reserva);
     }
 
     //Listar todas las reservas
-    public async Task<List<Reserva>> ListarTodas()
+    public async Task<List<ReservaRespuestaDTO>> ListarTodas()
     {
-        return await _context.reservas.Include(r => r.Huesped).ToListAsync();
+        return await _context.reservas.Include(r => r.Huesped).Select(r => MapearRespuesta(r)).ToListAsync();
         
     }
 
     //Buscar reservas por fecha
-    public async Task<List<Reserva>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida)
+    public async Task<List<ReservaRespuestaDTO>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida)
     {
         return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaEntrada && r.FechaFin <= fechaSalida)
+            .Select(r => MapearRespuesta(r))
             .ToListAsync();
     }
 
     //Buscar reservas desde una fecha de inicio
-    public async Task<List<Reserva>> BuscarDesdeInicio(DateTime fechaInicio)
+    public async Task<List<ReservaRespuestaDTO>> BuscarDesdeInicio(DateTime fechaInicio)
     {
         return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaInicio)
+            .Select(r => MapearRespuesta(r))
             .ToListAsync();
     }
-    public async Task<Reserva?> CambiarEstado(int id, string nuevoEstado)
+    public async Task<ReservaRespuestaDTO?> CambiarEstado(int id, string nuevoEstado)
     {
         var reserva = await _context.reservas.FindAsync(id);
         if (reserva == null)
@@ -110,6 +123,23 @@ public class ReservaService : IReservaService
         }
         reserva.Estado = nuevoEstado;
         await _context.SaveChangesAsync();
-        return reserva;
+        await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
+        return MapearRespuesta(reserva);
     }
+
+    //Mapeo de reserva a ReservaRespuestaDTO
+    private ReservaRespuestaDTO MapearRespuesta(Reserva r) => new ReservaRespuestaDTO
+    {
+        IdReserva = r.IdReserva,
+        FechaEntrada = r.FechaInicio,
+        FechaSalida = r.FechaFin,
+        CantidadPersonas = r.CantidadPersonas,
+        Comentarios = r.Comentarios,
+        Estado = r.Estado,
+        Monto = r.Monto,
+        Seña = r.Seña,
+        HuespedId = r.HuespedId,
+        NombreHuesped = r.Huesped?.Nombre ?? "",
+        ApellidoHuesped = r.Huesped?.Apellido ?? ""
+    };
 }
