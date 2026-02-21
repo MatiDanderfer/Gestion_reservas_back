@@ -32,7 +32,8 @@ public class ReservaService : IReservaService
             FechaFin = dto.FechaSalida,
             CantidadPersonas = dto.CantidadPersonas,
             Comentarios = dto.Comentarios,
-            Monto = dto.Monto
+            Monto = dto.Monto,
+            Estado = dto.Estado
         };
         _context.reservas.Add(reserva);
         await _context.SaveChangesAsync();
@@ -68,6 +69,7 @@ public class ReservaService : IReservaService
          reserva.CantidadPersonas = dto.CantidadPersonas;
         reserva.Comentarios = dto.Comentarios;
         reserva.Monto = dto.Monto;
+        reserva.Estado = dto.Estado;
         await _context.SaveChangesAsync();
         return reserva;
     }
@@ -98,5 +100,16 @@ public class ReservaService : IReservaService
         return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaInicio)
             .ToListAsync();
+    }
+    public async Task<Reserva?> CambiarEstado(int id, string nuevoEstado)
+    {
+        var reserva = await _context.reservas.FindAsync(id);
+        if (reserva == null)
+        {
+            return null;
+        }
+        reserva.Estado = nuevoEstado;
+        await _context.SaveChangesAsync();
+        return reserva;
     }
 }

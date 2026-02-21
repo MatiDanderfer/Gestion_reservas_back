@@ -12,5 +12,6 @@ public class ReservaCreateDTO
     public string? Comentarios { get; set; }
     [Range(0, int.MaxValue, ErrorMessage = "El monto debe ser un valor positivo.")]
     public int Monto { get; set; }
+    public string Estado { get; set; } = "Confirmada";
 
 }

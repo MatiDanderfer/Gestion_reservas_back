@@ -100,4 +100,20 @@ public class ReservaController : ControllerBase
         }
         return Ok(reservas);
     }
+
+    [HttpPatch("cambiarEstado/{id}")]
+    public async Task<IActionResult> CambiarEstado(int id, string nuevoEstado)
+    {
+        var estadosValidos = new List<string> { "Confirmada", "Cancelada", "Señada" };
+        if (!estadosValidos.Contains(nuevoEstado))
+        {
+            return BadRequest($"Estado inválido. Los estados válidos son: {string.Join(", ", estadosValidos)}.");
+        }
+        var reserva = await _reservaService.CambiarEstado(id, nuevoEstado);
+        if (reserva == null)
+        {
+            return NotFound($"Reserva no encontrada con id: {id}.");
+        }
+        return Ok(reserva);
+    }
 }

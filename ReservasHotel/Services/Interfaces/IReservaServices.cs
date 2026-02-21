@@ -9,4 +9,5 @@ public interface IReservaService
 
     Task<List<Reserva>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida);
     Task<List<Reserva>> BuscarDesdeInicio(DateTime fechaInicio);
+    Task<Reserva?> CambiarEstado(int id, string nuevoEstado);
 }
