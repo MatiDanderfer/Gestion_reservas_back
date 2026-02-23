@@ -93,6 +93,7 @@ public class ReservaController : ControllerBase
     [HttpGet("buscarDesdeInicio")]
     public async Task<IActionResult> BuscarDesdeInicio(DateTime fechaInicio)
     {
+        Console.WriteLine($"Fecha recibida: {fechaInicio}");
         var reservas = await _reservaService.BuscarDesdeInicio(fechaInicio);
         if (reservas == null || reservas.Count == 0)
         {

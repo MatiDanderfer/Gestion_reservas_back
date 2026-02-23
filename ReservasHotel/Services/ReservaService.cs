@@ -12,10 +12,9 @@ public class ReservaService : IReservaService
     // Buscar por nombre del huésped
     public async Task<List<ReservaRespuestaDTO>> Buscar(string nombreHuesped)
     {
-        return await _context.reservas.Include(r => r.Huesped)
-            .Where(r => r.Huesped.Nombre.Contains(nombreHuesped))
-            .Select(r => MapearRespuesta(r))
-            .ToListAsync();
+        var reservas = await _context.reservas.Include(r => r.Huesped)
+            .Where(r => r.Huesped.Nombre.Contains(nombreHuesped)).ToListAsync();
+        return reservas.Select(r => MapearRespuesta(r)).ToList();
     }
     // Crear una nueva reserva
     public async Task<ReservaRespuestaDTO> Crear(ReservaCreateDTO dto)
@@ -93,26 +92,41 @@ public class ReservaService : IReservaService
     //Listar todas las reservas
     public async Task<List<ReservaRespuestaDTO>> ListarTodas()
     {
-        return await _context.reservas.Include(r => r.Huesped).Select(r => MapearRespuesta(r)).ToListAsync();
+        //comflictuaba con el pedido a la db, por eso se hizo en dos pasos
+        //return await _context.reservas.Include(r => r.Huesped).Select(r => MapearRespuesta(r)).ToListAsync();
+        var reservas = await _context.reservas.Include(r => r.Huesped).ToListAsync();
+        return reservas.Select(r => MapearRespuesta(r)).ToList();
         
     }
 
     //Buscar reservas por fecha
     public async Task<List<ReservaRespuestaDTO>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida)
     {
-        return await _context.reservas.Include(r => r.Huesped)
+        /*return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaEntrada && r.FechaFin <= fechaSalida)
             .Select(r => MapearRespuesta(r))
+            .ToListAsync();*/
+        var reservas = await _context.reservas.Include(r => r.Huesped)
+            .Where(r => r.FechaInicio >= fechaEntrada && r.FechaFin <= fechaSalida)
             .ToListAsync();
+        return reservas.Select(r => MapearRespuesta(r)).ToList();
     }
 
     //Buscar reservas desde una fecha de inicio
     public async Task<List<ReservaRespuestaDTO>> BuscarDesdeInicio(DateTime fechaInicio)
     {
-        return await _context.reservas.Include(r => r.Huesped)
+        /*return await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaInicio)
             .Select(r => MapearRespuesta(r))
+            .ToListAsync();*/
+        var reservas = await _context.reservas.Include(r => r.Huesped)
+            .Where(r => r.FechaInicio >= fechaInicio).OrderBy(r => r.FechaInicio)
             .ToListAsync();
+
+        Console.WriteLine($"Reservas encontradas: {reservas.Count}");
+        var resultado = reservas.Select(r => MapearRespuesta(r)).ToList();
+        Console.WriteLine($"DTOs mapeados: {resultado.Count}");
+        return resultado;
     }
     public async Task<ReservaRespuestaDTO?> CambiarEstado(int id, string nuevoEstado)
     {
@@ -137,7 +151,7 @@ public class ReservaService : IReservaService
         Comentarios = r.Comentarios,
         Estado = r.Estado,
         Monto = r.Monto,
-        Seña = r.Seña,
+        Senia = r.Seña,
         HuespedId = r.HuespedId,
         NombreHuesped = r.Huesped?.Nombre ?? "",
         ApellidoHuesped = r.Huesped?.Apellido ?? ""

@@ -7,8 +7,8 @@ public class ReservaRespuestaDTO
     public string? Comentarios { get; set; }
     public string Estado { get; set; } 
     public int Monto { get; set; }
-    public int Seña { get; set; }
-    public int SaldoPendiente => Monto - Seña; //calculado automáticamente
+    public int Senia { get; set; }
+    public int SaldoPendiente => Monto - Senia; //calculado automáticamente
     public int HuespedId { get; set; }
     public string NombreHuesped { get; set; }
     public string ApellidoHuesped { get; set; }
