@@ -14,6 +14,6 @@ public class ReservaCreateDTO
     public int Monto { get; set; }
     public string Estado { get; set; } = "Confirmada";
 
-    public int Seña { get; set; } = 0;
+    public int Senia { get; set; } = 0;
 
 }

@@ -14,5 +14,5 @@ public class ReservaUpdateDTO
     public int Monto { get; set; }
     public string Estado { get; set; } 
 
-    public int Seña { get; set; }
+    public int Senia { get; set; }
 }

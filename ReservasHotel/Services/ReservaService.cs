@@ -34,7 +34,7 @@ public class ReservaService : IReservaService
             Comentarios = dto.Comentarios,
             Monto = dto.Monto,
             Estado = dto.Estado,
-            Seña = dto.Seña
+            Seña = dto.Senia
         };
         _context.reservas.Add(reserva);
         await _context.SaveChangesAsync();
@@ -72,7 +72,7 @@ public class ReservaService : IReservaService
         reserva.Comentarios = dto.Comentarios;
         reserva.Monto = dto.Monto;
         reserva.Estado = dto.Estado;
-        reserva.Seña = dto.Seña;
+        reserva.Seña = dto.Senia;
         await _context.SaveChangesAsync();
         await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
         return MapearRespuesta(reserva);
