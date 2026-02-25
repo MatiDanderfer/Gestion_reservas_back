@@ -20,7 +20,9 @@ public class ReservaService : IReservaService
     public async Task<ReservaRespuestaDTO> Crear(ReservaCreateDTO dto)
     {
         var solapamiento = await _context.reservas.AnyAsync(
-            r => r.FechaInicio <= dto.FechaSalida && r.FechaFin >= dto.FechaEntrada);
+            r => r.Estado != "Cancelada" && 
+            r.FechaInicio <= dto.FechaSalida &&
+            r.FechaFin >= dto.FechaEntrada);
         if (solapamiento)
         {
             throw new InvalidOperationException("Las fechas de la reserva se solapan con otra reserva existente.");
@@ -62,17 +64,24 @@ public class ReservaService : IReservaService
             return null;
         }
         var solapamiento = await _context.reservas.AnyAsync(
-            r => r.IdReserva != id && r.FechaInicio <= dto.FechaSalida && r.FechaFin >= dto.FechaEntrada);
+            r => r.IdReserva != id &&
+            r.Estado != "Cancelada" &&
+            r.FechaInicio <= dto.FechaSalida &&
+            r.FechaFin >= dto.FechaEntrada);
         if (solapamiento){
             throw new InvalidOperationException("Las fechas de la reserva se solapan con otra reserva existente.");
         }
         reserva.FechaInicio = dto.FechaEntrada;
         reserva.FechaFin = dto.FechaSalida;
-         reserva.CantidadPersonas = dto.CantidadPersonas;
+        reserva.CantidadPersonas = dto.CantidadPersonas;
         reserva.Comentarios = dto.Comentarios;
         reserva.Monto = dto.Monto;
         reserva.Estado = dto.Estado;
         reserva.Seña = dto.Senia;
+        if(dto.Estado == "Pagada")
+        {
+            reserva.Seña = reserva.Monto;
+        }
         await _context.SaveChangesAsync();
         await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
         return MapearRespuesta(reserva);
@@ -102,10 +111,6 @@ public class ReservaService : IReservaService
     //Buscar reservas por fecha
     public async Task<List<ReservaRespuestaDTO>> BuscarPorFecha(DateTime fechaEntrada, DateTime fechaSalida)
     {
-        /*return await _context.reservas.Include(r => r.Huesped)
-            .Where(r => r.FechaInicio >= fechaEntrada && r.FechaFin <= fechaSalida)
-            .Select(r => MapearRespuesta(r))
-            .ToListAsync();*/
         var reservas = await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaEntrada && r.FechaFin <= fechaSalida)
             .ToListAsync();
@@ -115,10 +120,6 @@ public class ReservaService : IReservaService
     //Buscar reservas desde una fecha de inicio
     public async Task<List<ReservaRespuestaDTO>> BuscarDesdeInicio(DateTime fechaInicio)
     {
-        /*return await _context.reservas.Include(r => r.Huesped)
-            .Where(r => r.FechaInicio >= fechaInicio)
-            .Select(r => MapearRespuesta(r))
-            .ToListAsync();*/
         var reservas = await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaInicio).OrderBy(r => r.FechaInicio)
             .ToListAsync();
@@ -136,6 +137,10 @@ public class ReservaService : IReservaService
             return null;
         }
         reserva.Estado = nuevoEstado;
+        if(nuevoEstado == "Pagada")
+        {
+            reserva.Seña = reserva.Monto;
+        }
         await _context.SaveChangesAsync();
         await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();
         return MapearRespuesta(reserva);

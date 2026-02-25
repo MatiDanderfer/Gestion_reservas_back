@@ -105,7 +105,7 @@ public class ReservaController : ControllerBase
     [HttpPatch("cambiarEstado/{id}")]
     public async Task<IActionResult> CambiarEstado(int id, string nuevoEstado)
     {
-        var estadosValidos = new List<string> { "Confirmada", "Cancelada", "Señada" };
+        var estadosValidos = new List<string> { "Confirmada", "Cancelada", "Señada","Pagada" };
         if (!estadosValidos.Contains(nuevoEstado))
         {
             return BadRequest($"Estado inválido. Los estados válidos son: {string.Join(", ", estadosValidos)}.");
