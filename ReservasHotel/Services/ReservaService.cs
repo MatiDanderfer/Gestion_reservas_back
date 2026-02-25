@@ -123,10 +123,7 @@ public class ReservaService : IReservaService
         var reservas = await _context.reservas.Include(r => r.Huesped)
             .Where(r => r.FechaInicio >= fechaInicio).OrderBy(r => r.FechaInicio)
             .ToListAsync();
-
-        Console.WriteLine($"Reservas encontradas: {reservas.Count}");
         var resultado = reservas.Select(r => MapearRespuesta(r)).ToList();
-        Console.WriteLine($"DTOs mapeados: {resultado.Count}");
         return resultado;
     }
     public async Task<ReservaRespuestaDTO?> CambiarEstado(int id, string nuevoEstado)
