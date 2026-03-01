@@ -38,6 +38,10 @@ public class ReservaService : IReservaService
             Estado = dto.Estado,
             Seña = dto.Senia
         };
+        if(dto.Estado == "Pagada")
+        {
+            reserva.Seña = reserva.Monto;
+        }
         _context.reservas.Add(reserva);
         await _context.SaveChangesAsync();
         await _context.Entry(reserva).Reference(r => r.Huesped).LoadAsync();

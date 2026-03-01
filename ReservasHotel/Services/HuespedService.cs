@@ -14,7 +14,7 @@ public class HuespedService : IHuespedService
     public async Task<List<Huesped>> Buscar(string nombre, string apellido)
     {
         return await _context.huespedes
-            .Where(h => h.Nombre.Contains(nombre) && h.Apellido.Contains(apellido))
+            .Where(h => h.Nombre.ToLower().Contains(nombre.ToLower()) && h.Apellido.ToLower().Contains(apellido.ToLower()))
             .ToListAsync();
     }
     // Crear un nuevo huésped
@@ -71,14 +71,14 @@ public class HuespedService : IHuespedService
     public async Task<List<Huesped>> BuscarPorNombre(string nombre)
     {
         return await _context.huespedes
-            .Where(h => h.Nombre.Contains(nombre))
+            .Where(h => h.Nombre.ToLower().Contains(nombre.ToLower()))
             .ToListAsync();
     }
     // Buscar huéspedes por apellido
     public async Task<List<Huesped>> BuscarPorApellido(string apellido)
     {
         return await _context.huespedes
-            .Where(h => h.Apellido.Contains(apellido))
+            .Where(h => h.Apellido.ToLower().Contains(apellido.ToLower()))
             .ToListAsync();
     }
 }
